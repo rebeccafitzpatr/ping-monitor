@@ -51,7 +51,7 @@ def ping_host(host):
 # Monitor and print
 # --------------------------
 console = Console()
-hosts = ["8.8.8.8", "1.1.1.1", "cloudflare.com"]
+hosts = ["8.8.8.8", "1.1.1.1", "cloudflare.com", "ec2.ap-southeast-2.amazonaws.com", "208.67.222.222"]
 stats = {host: HostStats(host) for host in hosts}
 
 def display_stats():
