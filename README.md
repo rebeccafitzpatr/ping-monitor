@@ -26,12 +26,16 @@ A real-time, terminal-based Python tool that pings multiple hosts every 100ms, s
 # Install dependencies in virtual environment
 python -m venv venv
 venv\Scripts\activate
-pip install rich plotext
+pip install rich plotext flask pandas plotly dash
 
 # Run the live terminal monitor only
 
 python monitor.py
 
-### Run and log all pings to logs.csv
+# Run and log all pings to logs.csv
 python monitor.py --log
+
+# Run web dashboard
+python dashboard.py
+
 ```
