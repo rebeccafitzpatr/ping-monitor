@@ -31,3 +31,7 @@ pip install rich plotext
 # Run the live terminal monitor only
 
 python monitor.py
+
+### Run and log all pings to logs.csv
+python monitor.py --log
+```

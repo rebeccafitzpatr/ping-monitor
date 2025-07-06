@@ -2,6 +2,9 @@ import subprocess
 import platform
 import re
 import time
+import csv
+import argparse
+from datetime import datetime
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from rich.console import Console
@@ -52,7 +55,18 @@ def ping_host(host):
 # --------------------------
 console = Console()
 hosts = ["8.8.8.8", "1.1.1.1", "cloudflare.com", "ec2.ap-southeast-2.amazonaws.com", "208.67.222.222"]
+parser = argparse.ArgumentParser()
+parser.add_argument("--log", action="store_true", help="Enable CSV logging to logs.csv")
+args = parser.parse_args()
+logging_enabled = args.log
+
 stats = {host: HostStats(host) for host in hosts}
+
+def log_ping_result(host, latency):
+    with open("logs.csv", mode="a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([datetime.utcnow().isoformat(), host, latency if latency is not None else "timeout"])
+
 
 def display_stats():
     table = Table(title="🏓 High-Frequency Ping Monitor (Windows)")
@@ -73,12 +87,20 @@ def display_stats():
     console.print(table)
 
 def monitor_loop():
+    if logging_enabled:
+        with open("logs.csv", mode="w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["timestamp", "host", "latency_ms"])
+
     with ThreadPoolExecutor(max_workers=len(hosts)) as executor:
         while True:
             futures = {executor.submit(ping_host, host): host for host in hosts}
             for future in futures:
                 host = futures[future]
                 latency = future.result()
+                if logging_enabled:
+                    log_ping_result(host, latency)
+
                 stats[host].record(latency)
             display_stats()
             time.sleep(0.1)  # 100ms between rounds
